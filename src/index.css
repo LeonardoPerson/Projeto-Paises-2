@@ -1,0 +1,156 @@
+body {
+  margin: 0;
+  font-size: 12px;
+  box-sizing: border-box;
+  margin: 0rem; 
+  font-family: 'Montserrat', 'Segoe UI', 'Roboto';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #6D2080;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/*header ----------------------------------------------------------------------------------------------*/
+.header { 
+  height: 100px;
+  box-shadow: 0 3px 5px 2px rgba(0, 0, 0, .2);
+}
+
+.header-voltar { 
+  border: 1px solid #6D2080;  
+  color: #6D2080;
+  text-decoration: none;
+  height: 36px;
+  width: 134px;
+}
+
+.header-voltar-mobile { 
+  border: none;
+  color: #6D2080;
+  text-decoration: none;
+  height: 36px;
+  width: 40px;
+}
+
+.header-voltar-mobile:hover { 
+  color: #6D2080;
+}
+
+
+
+
+.header-voltar:hover { 
+ color: #a573b3;
+}
+
+.logo-mova {
+  margin-left: 5%;
+  width: auto;
+  height: 80px;
+}
+
+.texto-voltar {
+  margin-top: 1px;
+  font-size: 16px;
+}
+
+/*Área de pesquisa ---------------------------------------------------------------------------------------*/
+
+.button-pesquisar {
+  color: white;
+  background-color: #6D2080;
+  border: none;
+  border-radius: 10px;
+}
+
+.dropdown {
+  font-size: 12px;
+  background-color: white!important;
+  color: #808080!important;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  /*border-bottom-width: 2px;*/
+  border-radius: 0;
+  border-color: #D3D3D3!important;  
+  box-shadow: none!important;
+}
+
+.dropdownItem {
+  font-size: 12px;
+  font-weight: 700;
+  color: #a0a0a0;
+}
+
+.dropdownItem:hover {
+  background-color: white;
+  color: #02AE99;
+}
+
+/*Exibição de países ----------------------------------------------------------------------------------------------*/
+
+.img-paises {
+  width: 280px;
+  height: auto;
+  box-shadow: 0 3px 5px 2px rgba(0, 0, 0, .4);
+}
+
+.img-paises-details {
+  width: 250px;
+  height: auto;
+  box-shadow: 0 3px 5px 2px rgba(0, 0, 0, .4);
+}
+
+
+/*Tratamento de erros -------------------------------------------------------------------------------------------*/
+
+.errorMessage {
+  font-weight: 700;
+  font-size: 14px;
+  opacity: .6;
+  color: #CB4D74;
+} 
+
+/*Página de detalhes do país ------------------------------------------------------------------------------------*/
+
+.textTitle {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.button-vizinhos {
+  border: none;
+  background-color: white;
+  
+}
+
+/*Paginação -------------------------------------------------------------------------------*/
+.pagination ul{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.pagination button{
+  box-shadow: 0 2px 2px 2px rgba(0, 0, 0, .2);
+  padding: 10px;
+}
+
+
+.pagination button:focus {
+  background: #6D2080!important;
+  color: white!important;
+}
+
+
+
+
+
+
+
+
+
