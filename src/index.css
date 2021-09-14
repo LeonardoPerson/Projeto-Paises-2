@@ -9,10 +9,6 @@ body {
   color: #073247;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
-
 /*header ----------------------------------------------------------------------------------------------*/
 .header { 
   height: 100px;
