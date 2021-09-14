@@ -1,14 +1,19 @@
 import React from 'react';
-import movaLogo from "../../assets/imagem/movaLogo.png";
+import logo from "../../assets/imagem/logo.jpg";
+import zerezes from "../../assets/imagem/zerezes.png";
 import { Link } from "react-router-dom";
 import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
 
 export const Header = () => {
   return (
     <div>
-      <nav className="navbar navbar-expand-lg header d-flex justify-content-between">
+      <nav className="navbar navbar-expand-lg header d-flex flex-nowrap justify-content-between ">
 
-        <img src={movaLogo} alt="Logo Mova" className="logo-mova" />
+        <img src={logo} alt="Logo Zerezes" className="logo-zerezes img-fluid" />
+        <button className="button-zerezes">
+          <img src={zerezes} alt="texto zerezes" className="text-zerezes img-fluid" />
+        </button>
+
 
         <div className="d-flex align-items-center">
           <Link to="/" className="navbar-nav navbar-toggler header-voltar-mobile" data-toggle="collapse">

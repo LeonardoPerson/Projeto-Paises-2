@@ -5,6 +5,7 @@ import axios from "axios";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Link } from "react-router-dom";
 import Pagination from '@material-ui/lab/Pagination';
+import { Col, Row, Form } from "react-bootstrap";
 
 export const Home = (props) => {
   const regiao = props.match.params.region;
@@ -12,8 +13,8 @@ export const Home = (props) => {
   const error = "Não foi possível buscar as informações, tente novamente..."
   const masculino = "um";
   const feminino = "uma"
-  const valorDefault = "Escolha uma opção";
   const regiaoParam = regiao;
+  const minimoParaBuscarTermo = 3;
   const [filtro, setFiltro] = useState("");
   const [menuSedundario, setMenuSecundario] = useState(null);
   const [paises, setPaises] = useState(null);
@@ -26,9 +27,16 @@ export const Home = (props) => {
   const [codigoLigacao, setCodigoLigacao] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [escolhaFiltroInicial, setEscolhaFiltroInicial] = useState("");
+  const [tipoFiltroDigitado, setTipoFiltroDigitado] = useState("");
+  const [buscaTermoDigitado, setBuscaTermoDigitado] = useState("");
+  const [avisoInicial, setAvisoInicial] = useState("");
+  const [avisoFinal, setAvisoFinal] = useState("");
   const [escolhaFiltroInicialEnglish, setEscolhaFiltroInicialEnglish] = useState("");
   const [escolhaFiltroFinal, setEscolhaFiltroFinal] = useState("");
   const [loading, setLoading] = useState(true);
+  const [limpezaFiltro, setLimpezaFiltro] = useState(false);
+
+  console.log(regiaoLista)
 
   //Paginação ----------------------------------------------------------------------------------------------------
   const itemsPerPage = 12;
@@ -65,23 +73,48 @@ export const Home = (props) => {
   //Obtendo a opção selecionada no primeiro filtro ----------------------------------------------------------
   const opcaoInicialSelecionada = (evt) => {
     evt.preventDefault();
-    const busca = menuInicial.find(item => item === evt.target.value);
+    const termo = evt.target.value;
+    setTipoFiltroDigitado(termo)
+    setAvisoInicial("");
+    setAvisoFinal("");
+    setEscolhaFiltroFinal("");
+    setBuscaTermoDigitado("");
+    if (termo.length >= minimoParaBuscarTermo) {
+      let busca = menuInicial.find(item => item.toLowerCase() === termo.trim().toLowerCase());
+      if (busca) {
+        setAvisoInicial("");
+        verificaGenero(busca);
+      } else {
+        setFiltro("");
+        setAvisoInicial("Sem resultados...");
+      }
+    }
     //Executando a verificação de gênero em conjunto com a opção selecionada
-    verificaGenero(busca);
   }
 
   //Obtendo a opção final selecionada no segundo filtro -----------------------------------------------------
   const opcaoFinalSelecionada = (evt) => {
     evt.preventDefault();
+    const termo = evt.target.value;
+    setBuscaTermoDigitado(termo);
     if (filtro === "Língua") {
       let buscaLanguage = paises.map(item => item.languages)
-      let comparaLanguage = buscaLanguage.map(item => item.find(item => item.name === evt.target.value && item.iso639_1))
+      let comparaLanguage = buscaLanguage.map(item => item.find(item => item.name.toLowerCase() === termo.trim().toLowerCase() && item.iso639_1))
       let buscaCodigo = comparaLanguage.filter(item => item !== undefined)
-      setEscolhaFiltroFinal(evt.target.value);
+      setEscolhaFiltroFinal(termo);
+      let buscaCod = buscaCodigo[0] ? buscaCodigo[0].iso639_1 : "";
+      setLinguaCode(buscaCod);
 
-      setLinguaCode(buscaCodigo[0].iso639_1);
+    } else if (termo === "áfrica") {
+      setEscolhaFiltroFinal("africa")
+
+    } else if (termo === "europa") {
+      setEscolhaFiltroFinal("europe")
+     
+    } else if (termo === "ásia"){
+      setEscolhaFiltroFinal("asia");
     } else {
-      setEscolhaFiltroFinal(evt.target.value);
+      setEscolhaFiltroFinal(termo);
     }
   }
 
@@ -108,7 +141,7 @@ export const Home = (props) => {
   }
 
   const buscaPais = (pais) => {
-    const resultado = pais.map(item => item.name);
+    const resultado = pais.map(item => item.translations.pt);
     setPaisLista([...new Set(resultado)]);
   }
 
@@ -143,7 +176,7 @@ export const Home = (props) => {
         setErrorMessage(error);
         setLoading(false);
       })
-  }, []);
+  }, [limpezaFiltro]);
 
   //Identifica a escolha do primeiro filtro e abastece o menu secundário ----------------------------------------------------------------------------
   const criaMenuSecundario = (escolha) => {
@@ -178,7 +211,8 @@ export const Home = (props) => {
   }, [filtro]);
 
   //Pesquisando pela escolha dos dois filtros ---------------------------------------------------------------------------------------
-  const pesquisaEscolha = () => {
+  const pesquisaEscolha = (evt) => {
+    evt && evt.preventDefault();
     setLoading(true);
     let busca = ""
     if (escolhaFiltroInicialEnglish === "lang") {
@@ -188,9 +222,13 @@ export const Home = (props) => {
     }
     axios.get(`https://restcountries.eu/rest/v2/${escolhaFiltroInicialEnglish}/${busca}`)
       .then(res => {
+        setAvisoFinal("")
         setResultadoPaises(res.data);
         setLoading(false);
       }).catch(res => {
+        if (res.response.status === 404) {
+          setAvisoFinal("Sem resultados...");
+        }     
         setErrorMessage(error)
         setLoading(false);
       })
@@ -213,53 +251,63 @@ export const Home = (props) => {
     }
   }, [regiaoParam, regiaoLista]);
 
+ 
+
   return (
     <div>
       <Header />
       {/*Primeiro filtro --------------------------------------------------------------------------------- */}
-      <div className="container p-5">
-        <div className="row">
-          <div className="col-sm p-3">
-            <div className="text-start">Filtrar por</div>
-            <Dropdown className="d-flex justify-content-start border-bottom">
-              <Dropdown.Toggle className="dropdown">{filtro || valorDefault}</Dropdown.Toggle>
-              <Dropdown.Menu>
-                {menuInicial.map((item, index) => (
-                  <Dropdown.Item className="dropdownItem" as="button" key={index} value={item} onClick={opcaoInicialSelecionada}>
-                    {item}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
-          </div>
-
-
-          {/*Segundo filtro com base no primeiro ---------------------------------------------------------- */}
-          <div className="col-sm p-3">
-            {
-              filtro &&
-              <div>
-                <div className="text-start">{filtro}</div>
-                <Dropdown className="d-flex justify-content-start border-bottom">
-                  <Dropdown.Toggle className="dropdown">{escolhaFiltroFinal ? escolhaFiltroFinal : escolhaFiltroInicial}</Dropdown.Toggle>
-                  <Dropdown.Menu className="">
-                    {menuSedundario && menuSedundario.map((item, index) => (
-                      <Dropdown.Item className="dropdownItem" as="button" key={index} value={item} onClick={opcaoFinalSelecionada}>
-                        {item}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
-                </Dropdown>
+      <Form className="p-5">
+        <div className="container">
+          <div className="row mt-5 mb-5 d-flex flex-wrap">
+            <div className="col-md-4 col-sm-12 col-xs-12 mt-3 mb-3">
+              <Form.Group>
+                <Form.Label>Escolha um tipo de filtro:</Form.Label>
+                <Form.Control
+                  placeholder="Região, capital, língua, país ou código de ligação."
+                  value={tipoFiltroDigitado}
+                  onChange={opcaoInicialSelecionada}
+                  type="text"
+                  className="input-filtro"
+                >
+                </Form.Control>
+              </Form.Group>
+              <div className="text-mensagem-busca">
+                {avisoInicial}
               </div>
-            }
-          </div>
+            </div>
 
-          {/*Botao para pesquisa com base nos filtros anteriores ------------------------------------------- */}
-          <div className="col-sm d-flex justify-content-end justify-content-md-center p-4">
-            <button className="button-pesquisar px-5 py-2" onClick={pesquisaEscolha}>PESQUISAR</button>
+
+            {/*Segundo filtro com base no primeiro ---------------------------------------------------------- */}
+            <div className="col-md-4 col-sm-12 col-xs-12 mt-3 mb-3">
+              {
+                filtro &&
+                <Form.Group className="d-flex flex-column align-items-between">
+                  <Form.Label>{filtro}</Form.Label>
+                  <Form.Control
+                    placeholder={escolhaFiltroFinal ? escolhaFiltroFinal : escolhaFiltroInicial}
+                    value={buscaTermoDigitado}
+                    onChange={opcaoFinalSelecionada}
+                    type="text"
+                    className="input-filtro"
+                  >
+                  </Form.Control>
+                  <div className="text-mensagem-busca">
+                    {avisoFinal}
+                  </div>
+                </Form.Group>
+              }
+            </div>
+
+            {/*Botao para pesquisa com base nos filtros anteriores ------------------------------------------- */}
+
+            <div className="col-md-4 col-sm-12 col-xs-12 mt-3 mb-3 d-flex justify-content-center align-items-center">
+              <button className="button-pesquisar px-5 py-2" onClick={pesquisaEscolha}>PESQUISAR</button>
+            </div>
+
           </div>
         </div>
-      </div>
+      </Form>
 
       {/*Exibição das bandeiras dos países------------------------------------------------------------- */}
       <div className="container">
