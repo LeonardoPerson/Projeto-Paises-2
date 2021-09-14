@@ -36,7 +36,7 @@ export const Home = (props) => {
   const [loading, setLoading] = useState(true);
   const [limpezaFiltro, setLimpezaFiltro] = useState(false);
 
-  console.log(regiaoLista)
+  console.log(paises)
 
   //Paginação ----------------------------------------------------------------------------------------------------
   const itemsPerPage = 12;
@@ -113,6 +113,8 @@ export const Home = (props) => {
      
     } else if (termo === "ásia"){
       setEscolhaFiltroFinal("asia");
+    } else if (termo === "américa"){
+      setEscolhaFiltroFinal("americas");
     } else {
       setEscolhaFiltroFinal(termo);
     }
