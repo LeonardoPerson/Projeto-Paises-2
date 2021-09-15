@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "../Layout/Header";
-import Dropdown from "react-bootstrap/Dropdown";
 import axios from "axios";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Link } from "react-router-dom";
 import Pagination from '@material-ui/lab/Pagination';
-import { Col, Row, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 
 export const Home = (props) => {
   const regiao = props.match.params.region;
@@ -16,15 +15,10 @@ export const Home = (props) => {
   const regiaoParam = regiao;
   const minimoParaBuscarTermo = 3;
   const [filtro, setFiltro] = useState("");
-  const [menuSedundario, setMenuSecundario] = useState(null);
   const [paises, setPaises] = useState(null);
   const [resultadoPaises, setResultadoPaises] = useState("");
   const [regiaoLista, setRegiaoLista] = useState(null);
-  const [capitalLista, setCapitalLista] = useState(null);
-  const [linguaLista, setLinguaLista] = useState(null);
   const [linguaCode, setLinguaCode] = useState(null);
-  const [paisLista, setPaisLista] = useState(null);
-  const [codigoLigacao, setCodigoLigacao] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [escolhaFiltroInicial, setEscolhaFiltroInicial] = useState("");
   const [tipoFiltroDigitado, setTipoFiltroDigitado] = useState("");
@@ -34,7 +28,6 @@ export const Home = (props) => {
   const [escolhaFiltroInicialEnglish, setEscolhaFiltroInicialEnglish] = useState("");
   const [escolhaFiltroFinal, setEscolhaFiltroFinal] = useState("");
   const [loading, setLoading] = useState(true);
-  const [limpezaFiltro, setLimpezaFiltro] = useState(false);
 
   console.log(paises)
 
@@ -105,15 +98,15 @@ export const Home = (props) => {
       let buscaCod = buscaCodigo[0] ? buscaCodigo[0].iso639_1 : "";
       setLinguaCode(buscaCod);
 
-    } else if (termo === "áfrica") {
+    } else if (termo && termo.toLowerCase() === "áfrica") {
       setEscolhaFiltroFinal("africa")
 
-    } else if (termo === "europa") {
+    } else if (termo && termo.toLowerCase() === "europa") {
       setEscolhaFiltroFinal("europe")
      
-    } else if (termo === "ásia"){
+    } else if (termo && termo.toLowerCase() === "ásia") {
       setEscolhaFiltroFinal("asia");
-    } else if (termo === "américa"){
+    } else if (termo && termo.toLowerCase() === "américa"){
       setEscolhaFiltroFinal("americas");
     } else {
       setEscolhaFiltroFinal(termo);
@@ -124,42 +117,7 @@ export const Home = (props) => {
   const buscaRegioes = (regioes) => {
     const resultado = regioes.map(item => item.region);
     setRegiaoLista([...new Set(resultado)].sort());
-  }
-
-  const buscaCapital = (capital) => {
-    const resultado = capital.map(item => item.capital);
-    setCapitalLista([...new Set(resultado)].sort());
-  }
-
-  const buscaLinguas = (linguas) => {
-    const resultadoFinal = []
-    const resultado = linguas.map(item => item.languages.map(item => item.name));
-    for (let i = 0; i < resultado.length; i++) {
-      for (let j = 0; j < resultado[j].length; j++) {
-        resultadoFinal.push(resultado[i][j]);
-      }
-    }
-    setLinguaLista([...new Set(resultadoFinal)].sort());
-  }
-
-  const buscaPais = (pais) => {
-    const resultado = pais.map(item => item.translations.pt);
-    setPaisLista([...new Set(resultado)]);
-  }
-
-  const buscaCodigoLigacao = (codigoLigacao) => {
-    const resultadoFinal = [];
-    const resultado = codigoLigacao.map(item => item.callingCodes);
-    for (let i = 0; i < resultado.length; i++) {
-      for (let j = 0; j < resultado[j].length; j++) {
-        if (resultado[i][j]) {
-          resultadoFinal.push(parseInt(resultado[i][j]));
-        }
-      }
-    }
-    setCodigoLigacao([...new Set(resultadoFinal)].sort((a, b) => a - b))
-  }
-
+  }   
 
   //Buscando as informações iniciais de países --------------------------------------------------------------
   useEffect(() => {
@@ -168,40 +126,31 @@ export const Home = (props) => {
       .then(res => {
         setPaises(res.data);
         setResultadoPaises(res.data);
-        buscaRegioes(res.data);
-        buscaCapital(res.data);
-        buscaLinguas(res.data);
-        buscaPais(res.data);
-        buscaCodigoLigacao(res.data);
+        buscaRegioes(res.data);       
         setLoading(false);
       }).catch(res => {
         setErrorMessage(error);
         setLoading(false);
       })
-  }, [limpezaFiltro]);
+  }, []);
 
   //Identifica a escolha do primeiro filtro e abastece o menu secundário ----------------------------------------------------------------------------
   const criaMenuSecundario = (escolha) => {
     if (escolha === "Região") {
       setEscolhaFiltroInicialEnglish("region");
-      setMenuSecundario(regiaoLista);
     }
     if (escolha === "Capital") {
       setEscolhaFiltroInicialEnglish("capital");
-      setMenuSecundario(capitalLista);
     }
     if (escolha === "Língua") {
       setEscolhaFiltroInicialEnglish("lang");
-      setMenuSecundario(linguaLista);
 
     }
     if (escolha === "País") {
       setEscolhaFiltroInicialEnglish("name");
-      setMenuSecundario(paisLista);
     }
     if (escolha === "Código de ligação") {
       setEscolhaFiltroInicialEnglish("callingcode");
-      setMenuSecundario(codigoLigacao);
     }
   }
 
@@ -244,7 +193,6 @@ export const Home = (props) => {
       setEscolhaFiltroFinal(regiaoParam);
       setLoading(false)
       if (regiaoLista) {
-        setMenuSecundario(regiaoLista);
         pesquisaEscolha();
         setLoading(false)
       }
